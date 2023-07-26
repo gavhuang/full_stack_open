@@ -1,16 +1,21 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 import Filter from "./components/Filter"
 import Persons from "./components/Persons"
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    {
-      name: 'Arto Hellas',
-      number: '040-1234567'
-    }
-  ])
+  const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [number, setNumber] = useState('')
+  const getPeopleFromDatabase = async () => await axios.get("../db.json")
+
+  useEffect(() => {
+    getPeopleFromDatabase()
+      .then(res => {
+        const { persons } = res.data
+        setPersons(persons)
+      })
+  }, [])
 
   const doesNameExist = persons => persons.find(person => {
     const { name } = person
