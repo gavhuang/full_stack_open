@@ -17,9 +17,13 @@ const App = () => {
 
   // "await pauses the execution of the surround async function"
   const getPhonebook = async () => {
-    const response = await phonebookService.getAll()
-    const phonebook = await response.data
-    setPersons(phonebook)
+    try {
+      const response = await phonebookService.getAll()
+      const phonebook = await response.data
+      setPersons(phonebook)
+    } catch (err) {
+      console.log(err.message)
+    }
   }
 
   useEffect(() => getPhonebook, [])
@@ -59,12 +63,16 @@ const App = () => {
       return
     }
 
-    const response = await phonebookService.create(newPerson)
-    const newPersonEntry = await response.data
+    try {
+      const response = await phonebookService.create(newPerson)
+      const newPersonEntry = await response.data
 
-    setPersons([...persons, newPersonEntry])
-    setName('')
-    setNumber('')
+      setPersons([...persons, newPersonEntry])
+      setName('')
+      setNumber('')
+    } catch (err) {
+      console.log(err.message)
+    }
   }
 
   return (
