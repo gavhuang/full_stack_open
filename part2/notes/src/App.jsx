@@ -14,7 +14,7 @@ const App = () => {
         const notes = response.data
         setNotes(notes)
       })
-      .catch(console.log("Cannot get data! JSON Server is not running!"))
+      .catch(() => console.log("Cannot get data! JSON Server is not running!"))
   }, [])
 
   const addNote = (event) => {
