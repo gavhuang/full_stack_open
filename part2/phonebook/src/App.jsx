@@ -8,13 +8,21 @@ const App = () => {
   const [name, setName] = useState('')
   const [number, setNumber] = useState('')
 
-  const getPhonebook = () => {
+  // Then chaining way instead of async/await (old way):
+  /*
     phonebookService
       .getAll()
-      .then(res => setPersons(res.data))
+      .then((res) => setPersons(res.data))
+  */
+
+  // "await pauses the execution of the surround async function"
+  const getPhonebook = async () => {
+    const response = await phonebookService.getAll()
+    const phonebook = await response.data
+    setPersons(phonebook)
   }
 
-  useEffect(() => getPhonebook(), [])
+  useEffect(() => getPhonebook, [])
 
   const doesNameExist = persons => persons.find(person => {
     const { name: nameInDB } = person
@@ -35,15 +43,14 @@ const App = () => {
   // Here I could filter for the deleted entry or make a call to the DB
   // Hitting the DB in prod might not be good because $$$
   // So maybe it's better to handle it client-side
-  const handleOnDelete = (id) => {
+  const handleOnDelete = async (id) => {
     if (window.confirm("Are you sure?")) {
-      phonebookService
-        .deleteEntry(id)
-        .then(() => getPhonebook())
+      await phonebookService.deleteEntry(id)
+      await getPhonebook()
     }
   }
 
-  const handleOnSubmit = (e) => {
+  const handleOnSubmit = async (e) => {
     e.preventDefault()
     const newPerson = { name, number }
 
@@ -52,14 +59,12 @@ const App = () => {
       return
     }
 
-    // The response returned here is the newPerson, which I destructure from `res`
-    phonebookService
-      .create(newPerson)
-      .then(({ data: newPerson }) => {
-        setPersons([...persons, newPerson])
-        setName('')
-        setNumber('')
-      })
+    const response = await phonebookService.create(newPerson)
+    const newPersonEntry = await response.data
+
+    setPersons([...persons, newPersonEntry])
+    setName('')
+    setNumber('')
   }
 
   return (
